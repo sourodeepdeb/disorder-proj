@@ -19,12 +19,10 @@ df_data = pd.read_csv(dir_path + "training_embedding.csv")
 X_matrix = np.array(df_data['ada_embedding'].apply(lambda x: ast.literal_eval(x)).tolist())
 y_matrix = np.array(df_data["target"].tolist())
 
-mask = np.isin(y_matrix, [0, 1, 3, 4])
+mask = np.isin(y_matrix, [0, 1, 2, 3, 4])
 X_matrix = X_matrix[mask]
 y_matrix = y_matrix[mask]
 
-label_map = {0: 0, 1: 1, 3: 2, 4: 3}
-y_matrix = np.array([label_map[y] for y in y_matrix])
 
 X_matrix, y_matrix = shuffle(X_matrix, y_matrix, random_state=42)
 
@@ -64,8 +62,8 @@ y_pred = model.predict(X_matrix_scaled)
 accuracy = accuracy_score(y_matrix, y_pred)
 print(f"\nOverall Accuracy: {accuracy:.4f}")
 
-category_mapping = {0: "Suicide", 1: "Stress", 2: "OCD", 3: "Anxiety"}
-for class_label in range(4):
+category_mapping = {0: "Suicide", 1: "Stress", 2: "Normal", 3: "OCD", 4: "Anxiety"}
+for class_label in range(5): 
     class_mask = y_matrix == class_label
     class_accuracy = accuracy_score(y_matrix[class_mask], y_pred[class_mask])
     print(f"Accuracy for {category_mapping[class_label]}: {class_accuracy:.4f}")
@@ -74,31 +72,9 @@ print("\nClassification Report:")
 print(classification_report(y_matrix, y_pred, target_names=list(category_mapping.values())))
 
 cm = confusion_matrix(y_matrix, y_pred)
-plt.figure(figsize=(10,8))
+plt.figure(figsize=(12,10)) 
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=list(category_mapping.values()), yticklabels=list(category_mapping.values()))
 plt.xlabel('Predicted')
 plt.ylabel('Actual')
 plt.title('Confusion Matrix')
 plt.show()
-
-def predict_category(text):
-    embedding = get_embedding(text, model='text-embedding-3-small')
-    embedding_scaled = scaler.transform([embedding])
-    prediction = model.predict(embedding_scaled)
-    return category_mapping[prediction[0]]
-
-print("\nEnter a sentence to predict its category.")
-print("Type 'exit' to end the program.")
-
-while True:
-    user_input = input("\nEnter your text: ").strip()
-
-    if user_input.lower() == 'exit':
-        print("Exiting the program. Goodbye!")
-        break
-
-    if user_input:
-        predicted_category = predict_category(user_input)
-        print(f"Predicted category: {predicted_category}")
-    else:
-        print("Please enter a valid text.")
