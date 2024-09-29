@@ -19,7 +19,7 @@ df_data = pd.read_csv(dir_path + "training_embedding.csv")
 X_matrix = np.array(df_data['ada_embedding'].apply(lambda x: ast.literal_eval(x)).tolist())
 y_matrix = np.array(df_data["target"].tolist())
 
-mask = np.isin(y_matrix, [0, 1, 2, 3, 4])
+mask = np.isin(y_matrix, [0, 1, 2, 3])
 X_matrix = X_matrix[mask]
 y_matrix = y_matrix[mask]
 
@@ -62,7 +62,7 @@ y_pred = model.predict(X_matrix_scaled)
 accuracy = accuracy_score(y_matrix, y_pred)
 print(f"\nOverall Accuracy: {accuracy:.4f}")
 
-category_mapping = {0: "Suicide", 1: "Stress", 2: "Normal", 3: "OCD", 4: "Anxiety"}
+category_mapping = {0: "Suicide", 1: "Stress", 2: "OCD", 3: "Anxiety"}
 for class_label in range(5): 
     class_mask = y_matrix == class_label
     class_accuracy = accuracy_score(y_matrix[class_mask], y_pred[class_mask])
